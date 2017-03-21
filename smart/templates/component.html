@@ -1,0 +1,12 @@
+<div class="<%= className %>">
+    <h1>
+        Welcome to the <%= name %> component!
+    </h1>
+    <b>Heroes</b><br>
+    <<%= className %>-item
+        ng-repeat="hero in $ctrl.list"
+        hero="hero"
+        on-delete="$ctrl.deleteHero(hero)"
+        on-update="$ctrl.updateHero(hero, prop, value)">
+    </<%= className %>-item>
+</div>

@@ -1,0 +1,11 @@
+<div class="<%= className %>-item">
+    <hr>
+    Name: {{$ctrl.hero.name}}<br>
+    Location:
+    <span ng-switch="$ctrl.editMode">
+        <input ng-switch-when="true" type="{{$ctrl.fieldType}}" ng-model="$ctrl.hero.location">
+        <span ng-switch-default>{{$ctrl.hero.location}}</span>
+    </span>
+    <button ng-click="$ctrl.handleModeChange()">{{$ctrl.editMode ? 'Save' : 'Edit'}}</button>
+    <button ng-click="$ctrl.delete()">Delete</button>
+</div>
