@@ -28,7 +28,7 @@ function <%= name %>Controller($scope, $log) {
 }
 
 var templateUrl = '<%= templateUrl %>';
-angular.module('app.core').component('<%= name %>', {
+angular.module('<%= moduleName %>').component('<%= name %>', {
   templateUrl: templateUrl,
   controller: ['$scope', '$log', <%= name %>Controller]
 });

@@ -4,6 +4,7 @@ var chalk = require('chalk');
 var yosay = require('yosay');
 var humps = require('humps');
 var path = require('path');
+var angularUtils = require('../util.js');
 
 module.exports = Generator.extend({
   prompting: function () {
@@ -13,12 +14,20 @@ module.exports = Generator.extend({
     ));
     var done = this.async();
 
-    var prompts = [{
-      type: 'input',
-      name: 'name',
-      message: 'Component Name? (use camelCase)',
-      default: this.appname
-    }];
+    var prompts = [
+      {
+        type: 'input',
+        name: 'name',
+        message: 'Component Name? (use camelCase)',
+        default: this.appname
+      },
+      {
+        type: 'input',
+        name: 'routeState',
+        message: 'Component Router State? (i.e: "app.home")',
+        default: 'app.home'
+      }
+    ];
 
     return this.prompt(prompts).then(function (props) {
       // To access props later use this.props.someAnswer;
@@ -36,6 +45,7 @@ module.exports = Generator.extend({
 
     var basePath = this.config.get('fullPath') + 'views/' + dirName;
     var templatePath = this.config.get('templatePath') + 'views/' + dirName;
+    var moduleName = this.config.get('module');
     var files = [
       {src: 'component.html',
         dest: basePath + name + '/' + name + '.html',
@@ -73,10 +83,36 @@ module.exports = Generator.extend({
         {
           name: file.name,
           className: file.className,
-          templateUrl: file.templateUrl
+          templateUrl: file.templateUrl,
+          moduleName: moduleName
         }
       );
     });
+
+    // this.uri = this.name;
+    // if (this.options.uri) {
+    //   this.uri = this.options.uri;
+    // }
+
+    var route = humps.decamelize(this.props.routeState.split('.').pop(), {separator: '-'});
+    var config = {
+      file: this.config.get('routeFile'),
+      // file: path.join(
+      //   this.env.options.appPath,
+      //   'scripts/app.' + (coffee ? 'coffee' : typescript ? 'ts': 'js')
+      //   ),
+      needle: '.otherwise',
+      state: this.props.routeState,
+      splicable: [
+        '  component: \'' + name + '\'',
+        '  url: \'/' + route + '\''
+      ]
+    };
+
+    config.splicable.unshift('.state(\'' + this.props.routeState + '\', {');
+    config.splicable.push('})');
+
+    angularUtils.rewriteFile(config);
   },
 
   install: function () {

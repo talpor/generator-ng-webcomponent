@@ -11,11 +11,30 @@ module.exports = Generator.extend({
     ));
 
     var prompts = [{
-      type: 'confirm',
-      name: 'someAnswer',
-      message: 'Would you like to enable this option?',
-      default: true
-    }];
+      type: 'input',
+      name: 'module',
+      message: 'Component Name? (i.e. "app.core")',
+      default: 'app.core'
+    },
+    {
+      type: 'input',
+      name: 'fullPath',
+      message: 'Path for your components? (default: "app/scripts/components/")',
+      default: 'app/scripts/components/'
+    },
+    {
+      type: 'input',
+      name: 'templatePath',
+      message: 'Relative path for your templates? (default: "scripts/components/")',
+      default: 'scripts/components/'
+    },
+    {
+      type: 'input',
+      name: 'routeFile',
+      message: 'Path for your Routes? (default: "app/scripts/routes.js")',
+      default: 'app/scripts/routes.js'
+    }
+    ];
 
     return this.prompt(prompts).then(function (props) {
       // To access props later use this.props.someAnswer;
@@ -24,13 +43,16 @@ module.exports = Generator.extend({
   },
 
   writing: function () {
-    this.fs.copy(
-      this.templatePath('dummyfile.txt'),
-      this.destinationPath('dummyfile.txt')
-    );
+    this.config.set({
+      module: this.props.module,
+      fullPath: this.props.fullPath,
+      templatePath: this.props.templatePath,
+      routeFile: this.props.routeFile
+    });
+    this.log('\n\nYour Component Generator is ready, now you can use:\n\tyo ng-webcomponent:smart <component name> or\n\tyo ng-webcomponent:dumb <component name>');
   },
 
   install: function () {
-    this.installDependencies();
+    // this.installDependencies();
   }
 });
