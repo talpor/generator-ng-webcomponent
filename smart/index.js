@@ -104,7 +104,7 @@ module.exports = Generator.extend({
       needle: '.otherwise',
       state: this.props.routeState,
       splicable: [
-        '  component: \'' + name + '\'',
+        '  component: \'' + name + '\',',
         '  url: \'/' + route + '\''
       ]
     };

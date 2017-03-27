@@ -3,21 +3,47 @@ var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var yosay = require('yosay');
 var humps = require('humps');
+var path = require('path');
 
 module.exports = Generator.extend({
   prompting: function () {
     // Have Yeoman greet the user.
-    // this.log(yosay(
-    //   'Welcome to the bee\'s knees ' + chalk.red('generator-ng-webcomponent') + ' generator!'
-    // ));
+    this.log(yosay(
+      'Welcome to the bee\'s knees ' + chalk.red('Dumb Component') + ' generator!'
+    ));
     var done = this.async();
 
-    var prompts = [{
-      type: 'input',
-      name: 'name',
-      message: 'Component Name? (use camelCase)',
-      default: this.appname
-    }];
+    var prompts = [
+      {
+        type: 'input',
+        name: 'name',
+        message: 'Component Name? (use camelCase)',
+        default: this.appname
+      },
+      {
+        type: 'list',
+        name: 'folder',
+        message: 'Place your component in folder?',
+        choices: [
+          {
+            name: 'views',
+            value: 'views/'
+          },
+          {
+            name: 'ui',
+            value: 'ui/'
+          }
+        ],
+        default: 'views'
+      }
+      // ,
+      // {
+      //   type: 'input',
+      //   name: 'routeState',
+      //   message: 'Component Router State? (i.e: "app.home")',
+      //   default: 'app.home'
+      // }
+    ];
 
     return this.prompt(prompts).then(function (props) {
       // To access props later use this.props.someAnswer;
@@ -27,37 +53,45 @@ module.exports = Generator.extend({
   },
 
   writing: function () {
-    var name = humps.camelize(this.props.name);
+    var dirName = path.dirname(this.props.name) === undefined ? '' : path.dirname(this.props.name) + '/';
+    var name = humps.camelize(path.basename(this.props.name));
     var className = humps.decamelize(name, {separator: '-'});
-    this.fs.copyTpl(
-      this.templatePath('component.js'),
-      this.destinationPath('app/scripts/components/ui/' + name + '/' + name + '.js'),
-      {
-        name: name,
-        className: className
-      }
-    );
 
-    this.fs.copyTpl(
-      this.templatePath('component.html'),
-      this.destinationPath('app/scripts/components/ui/' + name + '/' + name + '.html'),
-      {
+    var basePath = this.config.get('fullPath') + this.props.folder + dirName;
+    var templatePath = this.config.get('templatePath') + this.props.folder + dirName;
+    var moduleName = this.config.get('module');
+    var files = [
+      {src: 'component.html',
+        dest: basePath + name + '/' + name + '.html',
         name: name,
-        className: className
-      }
-    );
+        className: className},
+      {src: 'component.js',
+        dest: basePath + name + '/' + name + '.js',
+        templateUrl: templatePath + name + '/' + name + '.html',
+        name: name,
+        className: className},
+      {src: 'component.scss',
+        dest: basePath + name + '/' + name + '.scss',
+        name: name,
+        className: className}
+    ];
 
-    this.fs.copyTpl(
-      this.templatePath('component.scss'),
-      this.destinationPath('app/scripts/components/ui/' + name + '/' + name + '.scss'),
-      {
-        name: name,
-        className: className
-      }
-    );
+    var self = this;
+    files.forEach(function (file) {
+      self.fs.copyTpl(
+        self.templatePath(file.src),
+        self.destinationPath(file.dest),
+        {
+          name: file.name,
+          className: file.className,
+          templateUrl: file.templateUrl,
+          moduleName: moduleName
+        }
+      );
+    });
   },
 
   install: function () {
-    this.installDependencies();
+    // this.installDependencies();
   }
 });

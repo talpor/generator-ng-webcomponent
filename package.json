@@ -1,6 +1,6 @@
 {
   "name": "generator-ng-webcomponent",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Angular component based generator",
   "homepage": "",
   "author": {
